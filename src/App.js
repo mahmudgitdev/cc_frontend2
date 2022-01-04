@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route
+} from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import HomeScreen from "./views/HomeScreen";
+import LoginScreen from "./views/LoginScreen";
+import SignupScreen from "./views/SignupScreen";
+import ProfileScreen from "./views/ProfileScreen";
+import CreateScreen from "./views/CreateScreen";
+import SingleQuizScreen from "./views/SingleQuizScreen";
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router>
+      <Routes>
+        <Route path="/auth/login" element={<LoginScreen />} />
+        <Route path="/auth/register" element={<SignupScreen />} />
+        <Route path="/quiz/details/:id" element={<SingleQuizScreen />} />
+        <Route element={<ProtectedRoute />}>
+            <Route exact path="/" element={<HomeScreen />} />
+            <Route exact path="/profile" element={<ProfileScreen />} />
+            <Route exact path="/create" element={<CreateScreen />} />
+        </Route>
+      </Routes>
+    </Router>
+  )
 }
 
-export default App;
