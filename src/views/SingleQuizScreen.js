@@ -29,6 +29,7 @@ export default function SingleQuizScreen() {
         await authorizedApi.post('/get/quiz',{
             id:params.id
         }).then((res)=>{
+          console.log(res.data)
           setQuiz(res.data)
           setQuestions(res.data.questions);
         }).catch((err)=>{

@@ -41,10 +41,10 @@ export default function Header(props) {
                         </div>
                     </div>
                         {isShow?(
-                        <div className='w-60 h-48 bg-white rounded border-2 border-gray-200 absolute right-6'>
-                            <div className='flex flex-row justify-between items-center px-3 py-1'>
-                                <p className='text-sm text-gray-700 font-medium'>{props.user.name}</p>
-                                <Link className='text-sm text-gray-500' to="/profile">View profile</Link>
+                        <div className='w-60 h-auto bg-white rounded border-2 border-gray-200 absolute right-6'>
+                            <div className='flex flex-row justify-between text-center items-center px-3 py-1'>
+                                <p className='text-lg text-gray-700 font-bold'>{props.user.name}</p>
+                                {/* <Link className='text-sm text-gray-500' to="/profile">View profile</Link> */}
                             </div>
                             <div className='flex flex-col gap-3 px-3 py-1'>
                             <Link to="/settings" className='flex items-center gap-1'>
@@ -74,7 +74,7 @@ export default function Header(props) {
                             </Link>
                             </div>
                             <div className='border'></div>
-                            <div onClick={logout} className='flex items-center px-3 py-2 cursor-pointer gap-1'>
+                            <div onClick={logout} className='flex items-center px-3 pb-4 py-1 cursor-pointer gap-1'>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                 </svg>

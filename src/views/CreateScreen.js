@@ -57,7 +57,7 @@ export default function CreateScreen() {
             questions: defaultEmptyQuestion
         }).then((res)=>{
             if(res.data.success){
-                navigate('/profile');
+                navigate('/');
             }
         }).catch(err=>{
             console.log(err)
@@ -469,18 +469,35 @@ export default function CreateScreen() {
         </div>
       </div>
       <div className="w-full xl:w-1/3 p-6 xl:max-w-4xl border-l-1 border-gray-300 flex flex-col gap-4">
+      <div>
+            <div className='flex flex-row items-center'>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                <p className='text-gray-600 text-base font-bold'>Round</p>
+                
+            </div>
+           
+            <select className='w-full p-2 border border-gray-300 rounded' name="q_type">
+                <option value="quiz">Round 1</option>
+                <option value="puzzle">Round 2</option>
+                <option value="puzzle">Round 3</option>
+            </select>
+        </div>
+        
         <div>
             <div className='flex flex-row items-center'>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className='text-gray-600 text-base font-bold'>Question type</p>
+                
             </div>
            
             <select className='w-full p-2 border border-gray-300 rounded' name="q_type">
                 <option>Select Type</option>
-                <option value="quiz">Quiz</option>
-                <option value="puzzle">Puzzle</option>
+                <option value="quiz">Multiple Choice</option>
+                <option value="puzzle">Open Ended</option>
             </select>
         </div>
         <div>
@@ -493,7 +510,7 @@ export default function CreateScreen() {
            
             <select className='w-full p-2 border border-gray-300 rounded' name="time">
                 <option value="quiz">Standard</option>
-                <option value="puzzle">Standard Over</option>
+                <option value="puzzle">Extended</option>
             </select>
         </div>
         <div>
@@ -502,7 +519,18 @@ export default function CreateScreen() {
                         <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clipRule="evenodd" />
                         <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
                     </svg>
-                <p className='text-gray-600 text-base font-bold'>Points</p>
+                <p className='text-gray-600 text-base font-bold'>Points For First Right Answer</p>
+            </div>
+           
+            <input className='w-full p-2 border border-gray-300 rounded' placeholder='Points' />
+        </div>
+        <div>
+            <div className='flex flex-row items-center'>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clipRule="evenodd" />
+                        <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
+                    </svg>
+                <p className='text-gray-600 text-base font-bold'>Points For Remaining</p>
             </div>
            
             <input className='w-full p-2 border border-gray-300 rounded' placeholder='Points' />
