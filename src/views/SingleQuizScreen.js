@@ -1,15 +1,52 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useParams  } from 'react-router-dom';
+import { useParams, useNavigate  } from 'react-router-dom';
 import authorizedApi from '../api/authorizedApi';
 import Header from '../components/Header';
-
+import Modal from 'react-modal';
+import '../css/SingleQuiz.css';
+import ClipLoader from "react-spinners/ClipLoader";
 export default function SingleQuizScreen() {
     let params = useParams();
+    const navigate = useNavigate();
     const [quiz,setQuiz] = useState({});
     const [questions,setQuestions] = useState([]);
     const [isShow,setIsShow] = useState(false);
     const [selectedId,setSelectedId] = useState("");
     const [user,setUser] = useState({});
+    const [modalIsOpen, setIsOpen] = useState(false);
+    const [assignmodalIsOpen,setassignmodalIsOpen] = useState(false);
+    const [isLoading,setIsLoading] = useState(false);
+    const [endDate,setEndDate] = useState("");
+
+    const createAssignment = async()=>{
+      setIsLoading(true);
+      const pin  = Math.floor(1 + (Math.random() * (999999-1)));
+      await authorizedApi.post('/api/actions/save/assignment',{
+          title: quiz.title,
+          quizId: quiz._id,
+          gamepin: pin,
+          endDate: endDate
+      }).then((res)=>{
+        if(res.data.success){
+          console.log(res.data.data)
+         setTimeout(()=>{
+          navigate(`/reports/challenge/${quiz._id}/${res.data.data._id}`);
+         },2000)
+        }
+      }).catch(err=>{
+        console.log(err);
+      })
+
+
+
+
+    }
+
+
+
+
+
+
     const loadUser = async ()=>{
         const {data} = await authorizedApi.get('/auth/user');
         setUser(data);
@@ -18,18 +55,36 @@ export default function SingleQuizScreen() {
 
 
     const handleIsShow =(id)=>{
-      if(selectedId == id){
+      if(selectedId === id){
         setIsShow(!isShow);
       }else{
       setSelectedId(id);
       setIsShow(true);
       }
     }
+    const closeModal =()=>{
+      setIsOpen(false);
+    }
+
+    const closeAssignModal = ()=>{
+      setassignmodalIsOpen(false)
+    }
+    const customStyles = {
+      content: {
+        top: '40%',
+        left: '45%',
+        right: 'auto',
+        bottom: 'auto',
+        width: '50%',
+        marginRight: '-50%',
+        transform: 'translate(-40%, -50%)',
+        boxShadow: '0px 0px 18px -4px #333'
+      },
+    };
     const loadQuiz = async ()=>{
         await authorizedApi.post('/get/quiz',{
             id:params.id
         }).then((res)=>{
-          console.log(res.data)
           setQuiz(res.data)
           setQuestions(res.data.questions);
         }).catch((err)=>{
@@ -47,6 +102,100 @@ export default function SingleQuizScreen() {
     return (
         <div>
             <Header user={user} />
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                style={customStyles}
+            >
+              <div>
+                <h1 className='text-2xl font-bold text-gray-800 py-1'>Choose a way to play this Game</h1>
+              <div className='flex justify-between items-center py-3'>
+                <div className='bg-gray-200 p-2 text-center'>
+                  <img className='w-full' src="https://cdn.pixabay.com/photo/2017/05/09/13/33/laptop-2298286__340.png" alt="img" />
+                <button className='w-32 py-2 bg-green-700 rounded text-white font-bold'>Start</button>
+                </div>
+                <div className='bg-gray-200 p-2 text-center'>
+                  <img className='w-full' src="https://cdn.pixabay.com/photo/2015/12/15/06/42/kids-1093758__340.jpg" alt="img" />
+                <button onClick={()=>setassignmodalIsOpen(true)} className='w-32 py-2 bg-green-700 rounded text-white font-bold'>Assign</button>
+                </div>
+              </div>
+              </div>
+
+
+            </Modal>
+
+            <Modal
+                isOpen={assignmodalIsOpen}
+                onRequestClose={closeModal}
+                style={customStyles}
+            >
+              <div>
+                <h1 className='text-2xl font-bold text-gray-800 py-1'>Create an assigned</h1>
+                <div className='py-2 flex flex-col'>
+                <label className='font-bold'>Players should complete it before:</label>
+                <input onChange={(e)=>setEndDate(e.target.value)} className='border border-gray-500 py-1 px-2 rounded' type="datetime-local" />
+                </div>
+
+              <div className='py-2'>
+                <p className='text-xl font-bold text-gray-800'>Options</p>
+              </div>
+
+            <div className='border-b'>
+
+              <div className='flex flex-row justify-between py-1 border-b'>
+              <p>Question timer</p>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+              </div>
+
+              <div className='flex flex-row justify-between py-1 border-b'>
+              <p>Randomize answer order</p>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+              </div>
+
+              <div className='flex flex-row justify-between py-1'>
+              <p>Nickname generator</p>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+              </div>
+
+              </div>
+
+              <div className='w-80 mx-auto flex items-center py-3'>
+                <button onClick={closeAssignModal} className='w-32 py-2 bg-red-700 mr-2 rounded text-white font-bold'>Cancel</button>
+                {isLoading?(
+                  <>
+                   <ClipLoader loading={isLoading} color={"#324"} size={40} />
+                  </>
+                ):(
+                  <>
+                  <button onClick={createAssignment} className='w-32 py-2 bg-green-700 rounded text-white font-bold'>Create</button>
+                  </>
+                )}
+  
+               
+              </div>
+
+
+
+
+
+              </div>
+
+
+            </Modal>
+
+
+
+
+
         <div className="max-w-sm md:max-w-4xl lg:max-w-6xl mx-auto">
             <div className='flex flex-col lg:flex-row justify-between mt-5'>
             <div className="w-full lg:w-1/4 mr-4">
@@ -54,10 +203,10 @@ export default function SingleQuizScreen() {
                             <img className="rounded-t-lg" src="https://flowbite.com/docs/images/blog/image-1.jpg" alt={quiz.title}/>
                         <div className="p-5">
                                 <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{quiz.title}</h5>
-                            <Link to="/" className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                            Start
+                            <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                            Play
                             <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                            </Link>
+                            </button>
                         </div>
                     </div>
             </div>
@@ -79,7 +228,7 @@ export default function SingleQuizScreen() {
                             <img className='w-full' src={item.image} alt={item.image} />
                             </div>
                           </div>
-                          {isShow && item.id == selectedId?(
+                          {isShow && item.id === selectedId?(
                           <div>
                           <div className='flex flex-row justify-between items-center py-2 border-b'>
                           <p className='text-base font-bold text-gray-600'>
