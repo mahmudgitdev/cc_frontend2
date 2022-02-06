@@ -19,6 +19,7 @@ export default function ChallengeScreen() {
     const [points,setPoints] = useState(0);
     const [isAnswered,setisAnswered] = useState(false);
     const [isShowResult,setisShowResult] = useState(false);
+    const [isAnimation,setisAnimation] = useState(false);
 const loadChallenge = async()=>{
     await authorizedApi.post('/get/challenge',{
         id: params.qid
@@ -66,13 +67,20 @@ const submitAnswer = (answer)=>{
     }
 }
 const handleNext = ()=>{
+    
     const nextQuestion = currentQuestion + 1;
-    if(nextQuestion < questions.length){
-        setCurrentQuestion(nextQuestion);
-        setisAnswered(false);
-    }else{
-        setisShowResult(true);
+       if(nextQuestion < questions.length){
+            setisAnimation(true);
+            setTimeout(()=>{
+                setCurrentQuestion(nextQuestion);
+                setisAnswered(false);
+                setisAnimation(false);
+            },2000)
+        }else{
+            setisShowResult(true);
     }
+
+
     
 }
 const renderer = ({seconds, completed }) => {
@@ -165,6 +173,24 @@ useEffect(()=>{
                             <></>
                         ):(
                             <>
+                            {isAnimation?(
+                                <>
+                                    <div className="bg-blue-700 min-h-screen flex flex-col justify-center items-center">
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1.5 }}
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 260,
+                                                damping: 20
+                                            }} 
+                                        >
+                                        <p className="text-xl text-white font-bold ">Loading next</p>
+                                        </motion.div> 
+                                    </div>
+                                </>
+                            ):(
+                                <>
                                 <div className="flex w-full py-6 justify-center shadow-md bg-white items-center">
                                     <p className="font-bold text-2xl text-gray-600">{questions[currentQuestion].question}</p>
                                 </div>
@@ -219,6 +245,9 @@ useEffect(()=>{
                         
 
                         </div>
+                                </>
+                            )}
+                                
 
                             </>
                         )}
