@@ -81,15 +81,13 @@ export default function HomeScreen() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                         </svg>
-                        <div className='px-3 py-1 rounded flex flex-col items-center'>
+                        <div className='px-3 py-1 rounded flex flex-col'>
                             <p className='text-sm text-blue-600 font-bold cursor-pointer'>Ends in {differenceInCalendarDays(new Date(item.endDate), new Date())} days</p>
                             <p className='text-base text-gray-600 font-bold underline cursor-pointer'>{item.title}</p>
                         </div>
                     </div>
                     </Link>
                     })}
-
-
                 </div>
                 </div>
                 <div className='w-full bg-white border rounded px-4 pb-5'>

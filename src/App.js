@@ -20,7 +20,7 @@ export default function App() {
         <Route path="/auth/register" element={<SignupScreen />} />
         <Route path="/quiz/details/:id" element={<SingleQuizScreen />} />
         <Route path="/reports/challenge/:qid/:asgnid" element={<ChallengeReports />} />
-        <Route path="/challenge/:qid" element={<ChallengeScreen />} />
+        <Route path="/challenge/:asgnid" element={<ChallengeScreen />} />
         <Route element={<ProtectedRoute />}>
             <Route exact path="/" element={<HomeScreen />} />
             <Route exact path="/profile" element={<ProfileScreen />} />

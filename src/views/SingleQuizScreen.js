@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate  } from 'react-router-dom';
+import { useParams, useNavigate,Link  } from 'react-router-dom';
 import authorizedApi from '../api/authorizedApi';
 import Header from '../components/Header';
 import Modal from 'react-modal';
 import '../css/SingleQuiz.css';
 import ClipLoader from "react-spinners/ClipLoader";
+import { differenceInCalendarDays } from 'date-fns'
+
 export default function SingleQuizScreen() {
     let params = useParams();
     const navigate = useNavigate();
@@ -17,6 +19,9 @@ export default function SingleQuizScreen() {
     const [assignmodalIsOpen,setassignmodalIsOpen] = useState(false);
     const [isLoading,setIsLoading] = useState(false);
     const [endDate,setEndDate] = useState("");
+    const [myAssignment,setMyassignment] = useState([]);
+    const [isLoadingContent,setIsLoadingContent] = useState(true);
+
 
     const createAssignment = async()=>{
       setIsLoading(true);
@@ -28,7 +33,6 @@ export default function SingleQuizScreen() {
           endDate: endDate
       }).then((res)=>{
         if(res.data.success){
-          console.log(res.data.data)
          setTimeout(()=>{
           navigate(`/reports/challenge/${quiz._id}/${res.data.data._id}`);
          },2000)
@@ -43,7 +47,15 @@ export default function SingleQuizScreen() {
     }
 
 
-
+  const getAssignment = async()=>{
+      await authorizedApi.post('/get/assignment/by_quizid',{
+          id:params.id
+      }).then((res)=>{
+        setMyassignment(res.data)
+      }).catch((err)=>{
+        console.log(err);
+      })
+  }
 
 
 
@@ -87,6 +99,7 @@ export default function SingleQuizScreen() {
         }).then((res)=>{
           setQuiz(res.data)
           setQuestions(res.data.questions);
+          setIsLoadingContent(false);
         }).catch((err)=>{
           console.log(err);
         })
@@ -96,6 +109,7 @@ export default function SingleQuizScreen() {
     useEffect(()=>{
         loadUser();
         loadQuiz();
+        getAssignment();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
@@ -195,20 +209,61 @@ export default function SingleQuizScreen() {
 
 
 
-
+        {isLoadingContent?(
+        <>
+          <div className='flex w-full min-h-screen justify-center items-center'>
+          <ClipLoader loading={isLoadingContent} color={"#324"} size={40} />
+          </div>
+        </>
+        ):(
+        <>
         <div className="max-w-sm md:max-w-4xl lg:max-w-6xl mx-auto">
             <div className='flex flex-col lg:flex-row justify-between mt-5'>
-            <div className="w-full lg:w-1/4 mr-4">
+            <div className="w-full lg:w-1/3 fex mr-4">
                     <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-                            <img className="rounded-t-lg" src="https://flowbite.com/docs/images/blog/image-1.jpg" alt={quiz.title}/>
+                            <img className="rounded-t-lg" src={questions[0].image?questions[0].image:""} alt={quiz.title}/>
                         <div className="p-5">
                                 <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{quiz.title}</h5>
-                            <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                            Play
-                            <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                            </button>
+                            {myAssignment.length === 0?(
+                              <>
+                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              Play
+                              <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                              </button>
+                              </>
+                            ):(
+                              <div className='flex flex-row gap-3 items-center'>
+                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              Play
+                              </button>
+                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              Assign
+                              </button>
+                              </div>
+                            )}
+
                         </div>
                     </div>
+                  <div className='bg-white border rounded mt-5'>
+                    <div className='p-3'>
+                    <div>
+                        <p className='text-base font-bold text-gray-800'>Assignment of {quiz.title}</p>
+                    </div>
+                    </div>
+                    {myAssignment.slice(0, 5).map((item)=>{
+                        return <Link to={`/reports/challenge/${item.quizId}/${item._id}`}>
+                        <div className='flex flex-row justify-start items-center gap-1 ml-5'>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                        <div className='px-3 py-1 rounded flex flex-col'>
+                            <p className='text-sm text-blue-600 font-bold cursor-pointer'>Ends in {differenceInCalendarDays(new Date(item.endDate), new Date())} days</p>
+                            <p className='text-base text-gray-600 font-bold underline cursor-pointer'>{item.title}</p>
+                        </div>
+                    </div>
+                    </Link>
+                    })}
+                </div>
             </div>
             <div className="w-full lg:w-3/4">
                     <div className="border-b p-3">
@@ -280,6 +335,10 @@ export default function SingleQuizScreen() {
             </div>
   </div>
 </div>
+</>)}
+
+
+
 </div>
     )
 }
