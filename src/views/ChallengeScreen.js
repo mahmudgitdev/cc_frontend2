@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import swal from 'sweetalert';
 import authorizedApi from "../api/authorizedApi";
 import {GridLoader,PropagateLoader} from 'react-spinners';
-import Countdown from "react-countdown";
+import CountUp from 'react-countup';
 import correct_audio from '../audio/correct.mp3';
 import wrong_audio from '../audio/wrong.mp3';
 export default function ChallengeScreen() {
@@ -102,12 +102,12 @@ const submitOpenendedAnswer =(event)=>{
     var exits_answer = questions[currentQuestion].open_ended_option.includes(answer);
     if(exits_answer){
         if(firstRightAnsweredNotYet){
-            setPoints(points + parseInt(questions[currentQuestion].points_frans));
+            setPoints(points + parseInt(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0"));
             setfirstRightAnsweredNotYet(false);
-            setRecentPointsAdd(questions[currentQuestion].points_frans);
+            setRecentPointsAdd(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0");
         }else{
-            setPoints(points + parseInt(questions[currentQuestion].points_remaining));
-            setRecentPointsAdd(questions[currentQuestion].points_remaining);
+            setPoints(points + parseInt(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0"));
+            setRecentPointsAdd(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0");
         }
         setTimeout(()=>{
             setisShowCurrectAnswerMessage(true);
@@ -124,11 +124,11 @@ const submitAnswer = (answer)=>{
     setisShowTimer(false);
     if(answer === questions[currentQuestion].answer){
         if(firstRightAnsweredNotYet){
-            setPoints(points + parseInt(questions[currentQuestion].points_frans));
+            setPoints(points + parseInt(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0"));
             setfirstRightAnsweredNotYet(false);
             setRecentPointsAdd(questions[currentQuestion].points_frans);
         }else{
-            setPoints(points + parseInt(questions[currentQuestion].points_remaining));
+            setPoints(points + parseInt(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0"));
             setRecentPointsAdd(questions[currentQuestion].points_remaining);
         }
         setTimeout(()=>{
@@ -192,30 +192,20 @@ const handleNext = ()=>{
             }
              
         }
-
-
-    
 }
 
-const renderer = ({seconds, completed }) => {
-    if (completed) {
-      if(questions[currentQuestion].question_type === "quiz"){
+  const TimesUp = ()=>{
+    if(questions[currentQuestion].question_type === "quiz"){
         setisAnswered(true);
       }else{
         setisAnsweredOpenEnded(true);
       }
-      
       swal({
         title: "Times Up",
         icon: "warning",
         button: "Next",
       });
-      return "";
-    } else {
-      // Render a countdown
-      return <span>{seconds}</span>;
-    }
-  };
+  }
 useEffect(()=>{
     loadChallenge();
 },[]);
@@ -230,7 +220,7 @@ useEffect(()=>{
                 <p className="font-bold text-4xl text-gray-700">Scoreboard</p>
             </div>
             <div className="w-full">
-            <div className="max-w-sm md:max-w-2xl lg:max-w-5xl p-4 rounded shadow-inner bg-blue-900 mx-auto mt-10 px-28">
+            <div className="max-w-sm md:max-w-2xl lg:max-w-5xl p-4 rounded shadow-inner bg-blue-900 mx-auto mt-10 md:px-28">
             {scoreboard.sort((a,b)=> (a.points> b.points)?-1:1).map((item,i)=>{
                 return <div className={item.nickname === nickname ? "py-2 bg-white rounded mt-3": "py-2 mt-3"}>
                   <div className="flex flex-row justify-between items-center gap-4 px-10">
@@ -401,10 +391,12 @@ useEffect(()=>{
                             <div className={isShowTimer?"w-20 h-20 bg-green-600 text-white text-3xl font-bold flex justify-center items-center rounded-full":"bg-white w-20 h-20"}>
                             {isShowTimer?(
                                 <>
-                                <Countdown 
-                                date={Date.now() + questions[currentQuestion].time_limit*1000}
-                                renderer={renderer}
-                            />
+                                <CountUp 
+                                    start={questions[currentQuestion].time_limit}
+                                    end={0}
+                                    duration={questions[currentQuestion].time_limit}
+                                    onEnd={()=>TimesUp()}
+                                />
                                 </>
                             ):(
                                 <></>

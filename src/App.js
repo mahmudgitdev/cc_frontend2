@@ -12,6 +12,9 @@ import CreateScreen from "./views/CreateScreen";
 import SingleQuizScreen from "./views/SingleQuizScreen";
 import ChallengeReports from "./views/ChallengeReports";
 import ChallengeScreen from "./views/ChallengeScreen";
+import AuthorPlayScreen from "./views/AuthorPlayScreen";
+import PlayerJoinScreen from "./views/PlayerJoinScreen";
+import PlayGameScreen from "./views/PlayGameScreen";
 export default function App() {
   return (
     <Router>
@@ -21,6 +24,9 @@ export default function App() {
         <Route path="/quiz/details/:id" element={<SingleQuizScreen />} />
         <Route path="/reports/challenge/:qid/:asgnid" element={<ChallengeReports />} />
         <Route path="/challenge/:asgnid" element={<ChallengeScreen />} />
+        <Route path="/play" element={<AuthorPlayScreen />} />
+        <Route path="/join" element={<PlayerJoinScreen />} />
+        <Route path="/play/game" element={<PlayGameScreen />} />
         <Route element={<ProtectedRoute />}>
             <Route exact path="/" element={<HomeScreen />} />
             <Route exact path="/profile" element={<ProfileScreen />} />

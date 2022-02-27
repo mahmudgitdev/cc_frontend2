@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import '../css/SingleQuiz.css';
 import ClipLoader from "react-spinners/ClipLoader";
 import { differenceInCalendarDays } from 'date-fns'
+import SlotMachine from '../components/SlotMachine';
 
 export default function SingleQuizScreen() {
     let params = useParams();
@@ -25,11 +26,9 @@ export default function SingleQuizScreen() {
 
     const createAssignment = async()=>{
       setIsLoading(true);
-      const pin  = Math.floor(1 + (Math.random() * (999999-1)));
       await authorizedApi.post('/api/actions/save/assignment',{
           title: quiz.title,
           quizId: quiz._id,
-          gamepin: pin,
           endDate: endDate
       }).then((res)=>{
         if(res.data.success){
@@ -227,15 +226,17 @@ export default function SingleQuizScreen() {
                             {myAssignment.length === 0?(
                               <>
                               <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                              Play
+                              Start
                               <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                               </button>
                               </>
                             ):(
                               <div className='flex flex-row gap-3 items-center'>
-                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                              Play
+                              <Link to={`/play?quizid=${quiz._id}`}>
+                              <button className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              Start
                               </button>
+                              </Link>
                               <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                               Assign
                               </button>
@@ -266,6 +267,7 @@ export default function SingleQuizScreen() {
                 </div>
             </div>
             <div className="w-full lg:w-3/4">
+              {/* <SlotMachine questions={questions} /> */}
                     <div className="border-b p-3">
                       <h5 className="font-bold text-black">Questions ({questions.length})</h5>
                     </div>

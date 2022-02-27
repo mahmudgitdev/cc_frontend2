@@ -48,7 +48,7 @@ useEffect(()=>{
                 <p className='text-xl font-bold text-gray-700'>Invite more players!</p>
                 <p className='text-base font-medium text-gray-800'>Invite players by sharing the URL or PIN. Players can join this kahoot up until the deadline.</p>
                 <div className='flex flex-row py-1'>
-                <input className='py-2 border border-blue-500 px-5 rounded mr-2' type="text" value={`http:localhost/challenge/${params.asgnid}`} />
+                <input className='py-2 border border-blue-500 px-5 rounded mr-2' type="text" value={`http://localhost:3000/challenge/${params.asgnid}`} />
                 <CopyToClipboard text={`http://localhost:3000/challenge/${params.asgnid}`}>
                     <button className='py-2 px-2 bg-blue-500 font-bold text-white rounded'>Copy URL</button>
                 </CopyToClipboard>
@@ -97,13 +97,6 @@ useEffect(()=>{
                         </div>
                     </div>
                     </div>
-
-
-
-
-
-
-
             </div>
         </div>
       </div>

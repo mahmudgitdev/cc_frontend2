@@ -30,7 +30,9 @@ export default function HomeScreen() {
     },[])
     return (
         <div className='bg-gray-100 min-h-screen'>
+            
             <Header user={user} />
+            {process.env.SERVER_API}
             <div className='max-w-sm md:max-w-3xl lg:max-w-7xl mx-auto flex flex-col md:flex-row gap-3 mt-5'>
                 <div className='flex flex-col w-full md:w-1/3'>
                 <div className='bg-white border rounded'>
@@ -91,7 +93,7 @@ export default function HomeScreen() {
                 </div>
                 </div>
                 <div className='w-full bg-white border rounded px-4 pb-5'>
-                <div className='grid grid-cols-4 gap-5 mt-5'>
+                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-5'>
             {myLibrary.map((item)=>{
                 return(
                         <Link key={item._id} to={{
@@ -112,7 +114,7 @@ export default function HomeScreen() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className='text-base font-bold text-gray-600'>{item.title}</p>
+                                    <p className='text-sm font-bold text-gray-600'>{item.title}</p>
                                     <p className='text-xs text-gray-600 font-bold'>{user.name}</p>
                                 </div>
                             </div>
