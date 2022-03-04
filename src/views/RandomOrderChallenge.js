@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { motion } from 'framer-motion';
 import swal from 'sweetalert';
 import authorizedApi from "../api/authorizedApi";
@@ -7,12 +7,11 @@ import {GridLoader,PropagateLoader} from 'react-spinners';
 import CountUp from 'react-countup';
 import correct_audio from '../audio/correct.mp3';
 import wrong_audio from '../audio/wrong.mp3';
-export default function ChallengeScreen() {
+import SlotMachine from "../components/SlotMachine";
+export default function RandomOrderChallenge() {
 
     let params = useParams();
-    const navigate = useNavigate();
     const [quiz,setQuiz] = useState({});
-    const [questions,setQuestions] = useState([]);
     const [isLoading,setIsLoading] = useState(true);
     const [loadingStart,setloadingStart] = useState(false);
     const [nickname,setNickName] = useState("");
@@ -20,7 +19,7 @@ export default function ChallengeScreen() {
     const [isShowName,setIsShowName] = useState(false);
     const [isShowTitle,setisShowTitle] = useState(false);
     const [isShowTimer,setisShowTimer] = useState(true);
-    const [currentQuestion,setCurrentQuestion] = useState(0);
+    const [currentQuestion,setCurrentQuestion] = useState({});
     const [points,setPoints] = useState(0);
     const [isAnswered,setisAnswered] = useState(false);
     const [isAnsweredOpenEnded,setisAnsweredOpenEnded] = useState(false);
@@ -37,9 +36,9 @@ export default function ChallengeScreen() {
     const [firstRightAnsweredNotYet,setfirstRightAnsweredNotYet] = useState(true);
     const [recentPointsAdd,setRecentPointsAdd] = useState(0);
     const [scoreboard,setScoreBoard] = useState([]);
-
-   
-    
+    const [isShowSpin,setIsShowSpin] = useState(false);
+    const [currentRound,setCurrentRound] = useState(1);
+    const [questionIndex,setQuestionIndex] = useState(0);
 
 
 
@@ -47,20 +46,18 @@ const loadChallenge = async()=>{
     await authorizedApi.post('/get/challenge',{
         id: params.asgnid
     }).then((res)=>{
-        if(res.data.randomOrder === true){
-            navigate(`/challenge/${params.asgnid}/random-select`);
-        }else{
         setQuiz(res.data.quiz);
         setRound1Questions([...round1Questions,...res.data.quiz.questions.filter((item)=> item.round === "1")]);
         setRound2Questions([...round2Questions,...res.data.quiz.questions.filter((item)=> item.round === "2")]);
         setRound3Questions([...round3Questions,...res.data.quiz.questions.filter((item)=> item.round === "3")]);
         setTimeout(()=>{
             setIsLoading(false);
-        },2000);
-    }
+        },4000);
+    
 
     });
 }
+
 const letstart = (e)=>{
     e.preventDefault();
     setIsShowName(true);
@@ -103,15 +100,15 @@ const submitOpenendedAnswer =(event)=>{
     setisShowTimer(false);
     setisAnsweredOpenEnded(true);
     var answer = event.target.open_ended_answer.value;
-    var exits_answer = questions[currentQuestion].open_ended_option.includes(answer);
+    var exits_answer = currentQuestion.open_ended_option.includes(answer);
     if(exits_answer){
         if(firstRightAnsweredNotYet){
-            setPoints(points + parseInt(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0"));
+            setPoints(points + parseInt(currentQuestion.points_frans?currentQuestion.points_frans:"0"));
             setfirstRightAnsweredNotYet(false);
-            setRecentPointsAdd(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0");
+            setRecentPointsAdd(currentQuestion.points_frans?currentQuestion.points_frans:"0");
         }else{
-            setPoints(points + parseInt(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0"));
-            setRecentPointsAdd(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0");
+            setPoints(points + parseInt(currentQuestion.points_remaining?currentQuestion.points_remaining:"0"));
+            setRecentPointsAdd(currentQuestion.points_remaining?currentQuestion.points_remaining:"0");
         }
         setTimeout(()=>{
             setisShowCurrectAnswerMessage(true);
@@ -126,14 +123,14 @@ const submitOpenendedAnswer =(event)=>{
 const submitAnswer = (answer)=>{
     setisAnswered(true);
     setisShowTimer(false);
-    if(answer === questions[currentQuestion].answer){
+    if(answer === currentQuestion.answer){
         if(firstRightAnsweredNotYet){
-            setPoints(points + parseInt(questions[currentQuestion].points_frans?questions[currentQuestion].points_frans:"0"));
+            setPoints(points + parseInt(currentQuestion.points_frans?currentQuestion.points_frans:"0"));
             setfirstRightAnsweredNotYet(false);
-            setRecentPointsAdd(questions[currentQuestion].points_frans);
+            setRecentPointsAdd(currentQuestion.points_frans);
         }else{
-            setPoints(points + parseInt(questions[currentQuestion].points_remaining?questions[currentQuestion].points_remaining:"0"));
-            setRecentPointsAdd(questions[currentQuestion].points_remaining);
+            setPoints(points + parseInt(currentQuestion.points_remaining?currentQuestion.points_remaining:"0"));
+            setRecentPointsAdd(currentQuestion.points_remaining);
         }
         setTimeout(()=>{
             setisShowCurrectAnswerMessage(true);
@@ -144,62 +141,104 @@ const submitAnswer = (answer)=>{
         },400); 
     }
 }
+const handleSpin = (data)=>{
+    if(currentRound == 1){
+        setRound1Questions(round1Questions=>round1Questions.filter((item)=>{return item.id !== data.id}));
+    }else if(currentRound == 2){
+        setRound2Questions(round2Questions=>round2Questions.filter((item)=>{return item.id !== data.id}));
+    }else if(currentRound == 3){
+        setRound3Questions(round3Questions=>round3Questions.filter((item)=>{return item.id !== data.id}));
+    }
+    setCurrentQuestion(data);
+    setIsShowSpin(false);
 
+}
 const startGameRound1 = ()=>{
     setisRoundStart(true);
-    setQuestions([...questions,...round1Questions]);
     setTimeout(()=>{
         setisRoundStart(false);
+        setIsShowSpin(true);
     },4000);
 }
 const startGameRound2 = ()=>{
     setisRoundStart(true);
-    setQuestions([...questions,...round2Questions]);
-    setCurrentQuestion(round1Questions.length);
+    setCurrentRound(2);
+    setQuestionIndex(0);
     setisRound2Done(true);
     setisAnswered(false);
     setTimeout(()=>{
         setisRoundStart(false);
+        setIsShowSpin(true);
     },4000);
 }
 const startGameRound3 = ()=>{
     setisRoundStart(true);
-    setQuestions([...questions,...round3Questions]);
-    setCurrentQuestion(round1Questions.length+round2Questions.length);
+    setCurrentRound(3);
+    setQuestionIndex(0);
     setisRound3Done(true);
     setisAnswered(false);
     setTimeout(()=>{
         setisRoundStart(false);
+        setIsShowSpin(true);
     },4000);
 }
 const handleNext = ()=>{
     setisShowTimer(true);
     setisShowCurrectAnswerMessage(false);
     setisShowWrongAnswerMessage(false);
-    const nextQuestion = currentQuestion + 1;
-       if(nextQuestion < questions.length){
-            setisAnimation(true);
-            setTimeout(()=>{
-                setCurrentQuestion(nextQuestion);
-                setisAnswered(false);
-                setisAnsweredOpenEnded(false);
-                setisAnimation(false);
-            },2000)
-        }else{
-            if(!isRound2Done){
-                startGameRound2();
-            }else if(!isRound3Done){
-                startGameRound3();
+        if(currentRound == 1){
+            if(questionIndex < round1Questions.length){
+                setisAnimation(true);
+                setTimeout(()=>{
+                    setCurrentQuestion(round1Questions[questionIndex]);
+                    setQuestionIndex(questionIndex=>questionIndex+1);
+                    setisAnswered(false);
+                    setisAnsweredOpenEnded(false);
+                    setisAnimation(false);
+                },2000);
+            }else{
+                if(!isRound2Done){
+                    startGameRound2();
+                }
+            }
+        }else if(currentRound == 2){
+
+            if(questionIndex < round2Questions.length){
+                setisAnimation(true);
+                setTimeout(()=>{
+                    setCurrentQuestion(round2Questions[questionIndex]);
+                    setQuestionIndex(questionIndex=>questionIndex+1);
+                    setisAnswered(false);
+                    setisAnsweredOpenEnded(false);
+                    setisAnimation(false);
+                },2000);
+            }else{
+                if(!isRound3Done){
+                 startGameRound3();
+                }
+            }
+
+        }else if(currentRound == 3){
+
+            if(questionIndex < round3Questions.length){
+                setisAnimation(true);
+                setTimeout(()=>{
+                    setCurrentQuestion(round3Questions[questionIndex]);
+                    setQuestionIndex(questionIndex=>questionIndex+1);
+                    setisAnswered(false);
+                    setisAnsweredOpenEnded(false);
+                    setisAnimation(false);
+                },2000);
             }else{
                 setisShowResult(true);
                 saveReports();
             }
-             
+
         }
 }
 
   const TimesUp = ()=>{
-    if(questions[currentQuestion].question_type === "quiz"){
+    if(currentQuestion.question_type === "quiz"){
         setisAnswered(true);
       }else{
         setisAnsweredOpenEnded(true);
@@ -334,7 +373,7 @@ useEffect(()=>{
                                           stiffness: 260,
                                           damping: 50
                                         }}
-                                        className="text-2xl font-bold text-orange-600">Round {questions[currentQuestion].round}
+                                        className="text-2xl font-bold text-orange-600">Round {currentRound}
                                         </motion.p>
                                         
                                         </motion.div>
@@ -342,31 +381,42 @@ useEffect(()=>{
                               </div>
                            </>
                          ):(<>
-                         
-                         <div className="flex w-full py-6 justify-center shadow-md bg-white items-center">
-                            <p className="font-bold text-2xl text-gray-600">{questions[currentQuestion].question}</p>
-                        </div>
-                        {isShowCurrectAnswerMessage?(
-                        <>
-                        <motion.div
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{
-                                    type: "spring",
-                                    stiffness: 260,
-                                    damping: 25
-                                }}
-                        className="w-full bg-green-500 h-20 flex items-center justify-center">
-                            <div className="w-36 bg-green-700 py-2 rounded flex flex-col items-center justify-center shadow-inner">
-                                <p className="text-white font-bold">Correct Answer</p>
-                                <p className="text-white font-bold text-xs">+ {recentPointsAdd}</p>
+                          
+                          {isShowSpin?(<>
+                            {currentRound === 1?(<>
+                                <SlotMachine handleSpin={handleSpin} questions={round1Questions} currentRound={currentRound} />
+                            </>):(<>
+                               {currentRound === 2?(<>
+                                <SlotMachine handleSpin={handleSpin} questions={round2Questions} currentRound={currentRound} />
+                               </>):(<>
+                                <SlotMachine handleSpin={handleSpin} questions={round3Questions} currentRound={currentRound} />
+                               </>)}
+                            </>)}
+                           </>):(<>
+                            <div className="flex w-full py-6 justify-center shadow-md bg-white items-center">
+                                <p className="font-bold text-2xl text-gray-600">{currentQuestion.question}</p>
                             </div>
-                            <audio autoPlay={true}>
-                                <source src={correct_audio} type="audio/ogg" />
-                                <source src={correct_audio} type="audio/mpeg" />
-                            </audio>
-                        </motion.div>
-                        </>
+                         {isShowCurrectAnswerMessage?(
+                            <>
+                            <motion.div
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                transition={{
+                                        type: "spring",
+                                        stiffness: 260,
+                                        damping: 25
+                                    }}
+                            className="w-full bg-green-500 h-20 flex items-center justify-center">
+                                <div className="w-36 bg-green-700 py-2 rounded flex flex-col items-center justify-center shadow-inner">
+                                    <p className="text-white font-bold">Correct Answer</p>
+                                    <p className="text-white font-bold text-xs">+ {recentPointsAdd}</p>
+                                </div>
+                                <audio autoPlay={true}>
+                                    <source src={correct_audio} type="audio/ogg" />
+                                    <source src={correct_audio} type="audio/mpeg" />
+                                </audio>
+                            </motion.div>
+                            </>
                         ):(<></>)}
                         {isShowWrongAnswerMessage?(
                         <>
@@ -395,9 +445,9 @@ useEffect(()=>{
                             {isShowTimer?(
                                 <>
                                 <CountUp 
-                                    start={questions[currentQuestion].time_limit}
+                                    start={currentQuestion.time_limit}
                                     end={0}
-                                    duration={questions[currentQuestion].time_limit}
+                                    duration={currentQuestion.time_limit}
                                     onEnd={()=>TimesUp()}
                                 />
                                 </>
@@ -408,18 +458,18 @@ useEffect(()=>{
 
                             <div className='flex justify-center items-center overflow-hidden text-center mx-auto rounded w-72 h-48 bg-white shadow-lg mt-5'>
                    
-                                {questions[currentQuestion].image?(
+                                {currentQuestion.image?(
                                         <div>
-                                            <img src={questions[currentQuestion].image?questions[currentQuestion].image:""} style={{width:"100%",height:"100%"}} alt="qimage" />
+                                            <img src={currentQuestion.image?currentQuestion.image:""} style={{width:"100%",height:"100%"}} alt="qimage" />
                                         </div>
                                 ):(
                                     <>
-                                        {questions[currentQuestion].audio?(
+                                        {currentQuestion.audio?(
 
                                             <div className='w-full h-full bg-gray-700 flex justify-center items-center px-2'>
                                                 <audio controls autoPlay={true}>
-                                                    <source src={questions[currentQuestion].audio} type="audio/ogg" />
-                                                    <source src={questions[currentQuestion].audio} type="audio/mpeg" />
+                                                    <source src={currentQuestion.audio} type="audio/ogg" />
+                                                    <source src={currentQuestion.audio} type="audio/mpeg" />
                                                 </audio>
                                             </div>
                                             ):(
@@ -438,37 +488,37 @@ useEffect(()=>{
                         <div className="max-w-sm md:max-w-2xl lg:max-w-4xl mx-auto mt-10">
                         {isAnswered?(
                         <div className='grid grid-cols-2 gap-4 mt-5'>
-                            <div className={questions[currentQuestion].answer === "a" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{questions[currentQuestion].option1}</div>
+                            <div className={currentQuestion.answer === "a" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{currentQuestion.option1}</div>
                             
-                            <div className={questions[currentQuestion].answer === "b" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{questions[currentQuestion].option2}</div>
-                            <div className={questions[currentQuestion].answer === "c" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{questions[currentQuestion].option3}</div>
-                            <div className={questions[currentQuestion].answer === "d" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{questions[currentQuestion].option4}</div>
+                            <div className={currentQuestion.answer === "b" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{currentQuestion.option2}</div>
+                            <div className={currentQuestion.answer === "c" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{currentQuestion.option3}</div>
+                            <div className={currentQuestion.answer === "d" ? 'bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center':'bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold flex justify-center'}>{currentQuestion.option4}</div>
                          </div>
                         ):(
                         <>
-                        {questions[currentQuestion].question_type === "quiz"?(
+                        {currentQuestion.question_type === "quiz"?(
                             <>
                                 <div className='grid grid-cols-2 gap-4 mt-5'>
                                 <motion.div
                                 whileHover={{ scale: 1.02 }}
                                 onClick={()=>submitAnswer("a")}
                                 >
-                                    <button className="bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{questions[currentQuestion].option1}</button>
+                                    <button className="bg-red-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{currentQuestion.option1}</button>
                                 </motion.div>
                                 <motion.div 
                                 whileHover={{ scale: 1.02 }}
                                 onClick={()=>submitAnswer("b")}>
-                                    <button className="bg-blue-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{questions[currentQuestion].option2}</button>
+                                    <button className="bg-blue-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{currentQuestion.option2}</button>
                                 </motion.div>
                                 <motion.div 
                                 whileHover={{ scale: 1.02 }}
                                 onClick={()=>submitAnswer("c")}>
-                                    <button className="bg-yellow-500 border-2 w-full py-4 rounded text-xl text-white font-bold">{questions[currentQuestion].option3}</button>
+                                    <button className="bg-yellow-500 border-2 w-full py-4 rounded text-xl text-white font-bold">{currentQuestion.option3}</button>
                                 </motion.div>
                                 <motion.div 
                                 whileHover={{ scale: 1.02 }}
                                 onClick={()=>submitAnswer("d")}>
-                                    <button className="bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{questions[currentQuestion].option4}</button>
+                                    <button className="bg-green-700 border-2 w-full py-4 rounded text-xl text-white font-bold">{currentQuestion.option4}</button>
                                 </motion.div>
                                 </div>
                             </>
@@ -503,9 +553,9 @@ useEffect(()=>{
                         </div>
                          
                          
+                        </>)}
                          
-                         
-                         </>)}
+                    </>)}
                             
                           </>
                      )}

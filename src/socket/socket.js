@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-const SERVER = "localhost:8080";
+const SERVER = "localhost:5000";
 export default io(SERVER, {
     withCredentials: true,
     extraHeaders: {

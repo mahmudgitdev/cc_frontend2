@@ -112,7 +112,9 @@ export default function AuthorPlayScreen() {
     const createGameRoom = ()=>{
       const pin  = Math.floor(1 + (Math.random() * (9999-1)));
       setGamePin(pin);
-      socket.emit('join',{author: `admin${pin.toString}` ,name: "roomadmin0304",room: pin});
+      socket.emit('createRoom',{author: `admin${pin.toString()}`,room: pin},(response)=>{
+        console.log("Room Created: " + response);
+      });
     }
 
     const startGame = ()=>{
@@ -474,19 +476,19 @@ export default function AuthorPlayScreen() {
     
       <div className='bg-blue-700 min-h-screen overflow-hidden'>
         <div className='bg-blue-900 py-4'>
-          <div className='w-96 mx-auto rounded bg-white py-2 px-4 flex flex-row justify-between items-center'>
+          <div className='max-w-sm md:max-w-xl mx-auto rounded bg-white py-2 md:px-4 flex flex-row justify-between items-center'>
             <div className='px-2 flex flex-col'>
               <p className='text-sm font-bold'>Join at:</p>
-              <p className='text-sm font-bold'>www.championchallenger.com</p>
+              <p className='text-sm font-bold'>http://championchallenger.demo.saz-zad.com/join</p>
             </div>
             <div className='flex flex-col'>
-              <p className='text-base font-bold'>Game PIN:</p>
+              <p className='text-sm font-bold'>Game PIN:</p>
               <div title={isCopiyed?"Copied Link":"Copy Link to Share"} className='bg-gray-100 p-2 rounded'>
                <CopyToClipboard
-               text={`http://localhost:3000/join?gamepin=${gamepin}`}
+               text={`http://localhost:3000/refer?pin=${gamepin}`}
                onCopy={()=>setIsCopied(true)}
               >
-              <p className='text-5xl font-bold cursor-pointer'>{gamepin}</p>
+              <p className='text-4xl md:text-5xl font-bold cursor-pointer'>{gamepin}</p>
               </CopyToClipboard>
               </div>
             </div>
@@ -512,14 +514,14 @@ export default function AuthorPlayScreen() {
           </div>
         </div>
 
-        <div className='flex justify-center mt-12'>
+        <div className='flex justify-center mt-12 md:px-6'>
           {players.length === 0?(
             <div className='bg-blue-800 p-3 rounded'>
                 <p className='text-2xl font-bold text-gray-100'>Waiting for players...</p>
             </div>
           ):(
-            <div className='flex flex-row gap-6 items-center'>
-            {players.filter((player)=>player.name !== 'roomadmin0304').map((player)=>{
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8'>
+            {players.map((player)=>{
                   return <motion.div 
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1.1 }}
@@ -528,8 +530,8 @@ export default function AuthorPlayScreen() {
                     stiffness: 260,
                     damping: 20
                   }}
-                  key={player.id} className='bg-blue-800 p-2 rounded'>
-                  <p className='text-2xl font-bold text-gray-100'>{player.name}</p>
+                  key={player.id} className='bg-blue-800 p-2 rounded flex justify-center items-center'>
+                  <p className='text-2xl font-bold text-gray-100 flex items-center'>{player.name}</p>
               </motion.div>
             })}
 

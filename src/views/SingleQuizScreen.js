@@ -6,7 +6,6 @@ import Modal from 'react-modal';
 import '../css/SingleQuiz.css';
 import ClipLoader from "react-spinners/ClipLoader";
 import { differenceInCalendarDays } from 'date-fns'
-import SlotMachine from '../components/SlotMachine';
 
 export default function SingleQuizScreen() {
     let params = useParams();
@@ -22,12 +21,13 @@ export default function SingleQuizScreen() {
     const [endDate,setEndDate] = useState("");
     const [myAssignment,setMyassignment] = useState([]);
     const [isLoadingContent,setIsLoadingContent] = useState(true);
-
-
+    const [randomOrder,setRandomOrder] = useState(false);
+    
     const createAssignment = async()=>{
       setIsLoading(true);
       await authorizedApi.post('/api/actions/save/assignment',{
           title: quiz.title,
+          randomOrder: randomOrder,
           quizId: quiz._id,
           endDate: endDate
       }).then((res)=>{
@@ -39,11 +39,7 @@ export default function SingleQuizScreen() {
       }).catch(err=>{
         console.log(err);
       })
-
-
-
-
-    }
+  }
 
 
   const getAssignment = async()=>{
@@ -166,7 +162,7 @@ export default function SingleQuizScreen() {
               <div className='flex flex-row justify-between py-1 border-b'>
               <p>Randomize answer order</p>
               <label class="switch">
-                <input type="checkbox" />
+                <input onChange={()=>setRandomOrder(!randomOrder)} type="checkbox" />
                 <span class="slider"></span>
               </label>
               </div>
@@ -267,7 +263,6 @@ export default function SingleQuizScreen() {
                 </div>
             </div>
             <div className="w-full lg:w-3/4">
-              {/* <SlotMachine questions={questions} /> */}
                     <div className="border-b p-3">
                       <h5 className="font-bold text-black">Questions ({questions.length})</h5>
                     </div>

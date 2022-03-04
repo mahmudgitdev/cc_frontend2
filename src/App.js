@@ -14,7 +14,9 @@ import ChallengeReports from "./views/ChallengeReports";
 import ChallengeScreen from "./views/ChallengeScreen";
 import AuthorPlayScreen from "./views/AuthorPlayScreen";
 import PlayerJoinScreen from "./views/PlayerJoinScreen";
+import JoinScreen from "./views/JoinScreen";
 import PlayGameScreen from "./views/PlayGameScreen";
+import RandomOrderChallenge from "./views/RandomOrderChallenge";
 export default function App() {
   return (
     <Router>
@@ -24,8 +26,10 @@ export default function App() {
         <Route path="/quiz/details/:id" element={<SingleQuizScreen />} />
         <Route path="/reports/challenge/:qid/:asgnid" element={<ChallengeReports />} />
         <Route path="/challenge/:asgnid" element={<ChallengeScreen />} />
+        <Route path="/challenge/:asgnid/random-select" element={<RandomOrderChallenge />} />
         <Route path="/play" element={<AuthorPlayScreen />} />
-        <Route path="/join" element={<PlayerJoinScreen />} />
+        <Route path="/join" element={<JoinScreen />} />
+        <Route path="/refer" element={<PlayerJoinScreen />} />
         <Route path="/play/game" element={<PlayGameScreen />} />
         <Route element={<ProtectedRoute />}>
             <Route exact path="/" element={<HomeScreen />} />

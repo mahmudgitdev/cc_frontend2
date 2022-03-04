@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation,useNavigate} from 'react-router-dom';
 import socket from '../socket/socket';
 import {ClockLoader} from 'react-spinners';
 import { motion } from 'framer-motion';
@@ -8,7 +8,9 @@ import CountUp from 'react-countup';
 import correct_audio from '../audio/correct.mp3';
 import wrong_audio from '../audio/wrong.mp3';
 export default function PlayGameScreen() {
-    let location = useLocation();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [player,setPlayer] = useState({});
     const [isStart,setIsStart] = useState(false);
     const [isDelay,setIsDelay] = useState(false);
     const [currentQuestion,setCurrentQuestion] = useState({});
@@ -23,7 +25,6 @@ export default function PlayGameScreen() {
     const [recentPointsAdd,setRecentPointsAdd] = useState(0);
     const [isShowResult,setisShowResult] = useState(false);
     const [results,setResult] = useState([]);
-    const queryParams = new URLSearchParams(location.search);
 
     const submitAnswer = (answer)=>{
       setisAnswered(true);
@@ -105,24 +106,6 @@ export default function PlayGameScreen() {
     }
 
 }
-
-    useEffect(()=>{
-        let name = queryParams.get("name");
-        let room = queryParams.get("pin");
-        let author = "player";
-        socket.emit('join',{author,name,room});
-        return ()=>{
-            socket.emit('disconnect');
-            socket.off();
-        }
-    },[]);
-
-  // useEffect(()=>{
-  //   socket.on('error_join',(error)=>{
-  //     alert(error);
-  //   })
-  // },[])
-
   useEffect(()=>{
     socket.on('getting_ready',()=>{
       setIsDelay(true);
@@ -175,18 +158,38 @@ export default function PlayGameScreen() {
     });
   }
 
+  useEffect(()=>{
+    if(location.state === "null"){
+      navigate('/join',{ replace: true });
+    }else{
+      setPlayer(location.state);
+    }
+  },[location.state, navigate]);
+
+  useEffect(()=>{
+    socket.on('admin_left',()=>{
+      swal({
+        title: "Host Disconnected!!",
+        icon: "warning",
+        button: "Next",
+      });
+      navigate('/join',{ replace: true });
+    });
+  })
+
   useEffect(() => {
     const unloadCallback = (event) => {
       event.preventDefault();
       event.returnValue = "";
+      navigate('/join',{ replace: true });
       return ()=>{
         socket.emit('disconnect');
         socket.off();
     }
-    };
+  };
     window.addEventListener("beforeunload", unloadCallback);
     return () => window.removeEventListener("beforeunload", unloadCallback);
-  },[]);
+  });
 
   return (
     <div>
@@ -198,13 +201,13 @@ export default function PlayGameScreen() {
             <div className="w-full">
             <div className="max-w-sm md:max-w-2xl lg:max-w-5xl p-4 rounded shadow-inner bg-blue-900 mx-auto mt-10 md:px-28">
             {results.sort((a,b)=> (a.points> b.points)?-1:1).map((item,i)=>{
-                return <div className={item.name === queryParams.get("name") ? "py-2 bg-white rounded mt-3": "py-2 mt-3"}>
+                return <div className={item.name === player.name ? "py-2 bg-white rounded mt-3": "py-2 mt-3"}>
                   <div className="flex flex-row justify-between items-center gap-4 px-10">
                       <div className="flex flex-row items-center gap-4">
-                      <p className={item.name === queryParams.get("name") ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}>{i+1}</p>
-                      <p className={item.name === queryParams.get("name") ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}>{item.name}</p>
+                      <p className={item.name === player.name ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}>{i+1}</p>
+                      <p className={item.name === player.name ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}>{item.name}</p>
                       </div>
-                      <p className={item.name === queryParams.get("name") ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}><CountUp duration={1} end={item.points} /></p>
+                      <p className={item.name === player.name ?"text-gray-700 font-bold text-xl":"text-white font-bold text-xl"}><CountUp duration={1} end={item.points} /></p>
                   </div>
                 </div>
             })}
@@ -426,7 +429,7 @@ export default function PlayGameScreen() {
 
 
       <nav className='bg-blue-900 fixed bottom-0 inset-x-0 h-12 px-6 justify-between flex items-center z-50'>
-        <p className='text-lg font-bold text-white'>{queryParams.get("name")}</p>
+        <p className='text-lg font-bold text-white'>{player.name}</p>
         <div className='bg-gray-800 px-2 rounded flex items-center justify-center'>
         <p className='text-lg font-bold text-white'>{points}</p>
         </div>
