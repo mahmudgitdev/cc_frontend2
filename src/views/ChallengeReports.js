@@ -10,6 +10,7 @@ export default function ChallengeReports() {
     const [isLoading,setisLoading] = useState(true);
     const [assignment,setAssignment] = useState({});
     const [participant,setParticipant] = useState([]);
+    const [isCopiyed,setIsCopied] = useState(false);
     participant.sort((a,b)=>(a.points > b.points) ? -1: 1);
     const loadAssignmentReports = async ()=>{
         await authorizedApi.post('/get/assignment/report',{
@@ -48,9 +49,12 @@ useEffect(()=>{
                 <p className='text-xl font-bold text-gray-700'>Invite more players!</p>
                 <p className='text-base font-medium text-gray-800'>Invite players by sharing the URL or PIN. Players can join this kahoot up until the deadline.</p>
                 <div className='flex flex-row py-1'>
-                <input className='py-2 border border-blue-500 px-5 rounded mr-2' type="text" value={`http://localhost:3000/challenge/${params.asgnid}`} />
-                <CopyToClipboard text={`http://localhost:3000/challenge/${params.asgnid}`}>
-                    <button className='py-2 px-2 bg-blue-500 font-bold text-white rounded'>Copy URL</button>
+                <input className='py-2 border border-blue-500 px-5 rounded mr-2' type="text" value={`http://championchallenger.demo.saz-zad.com/challenge/${params.asgnid}`} />
+                <CopyToClipboard 
+                text={`http://championchallenger.demo.saz-zad.com/challenge/${params.asgnid}`}
+                onCopy={()=>setIsCopied(true)}
+                >
+                    <button className='py-2 px-2 bg-blue-500 font-bold text-white rounded'>{isCopiyed?'Copied':'Copy URL'}</button>
                 </CopyToClipboard>
                 </div>
                 {/* <p className='py-2'>Game Pin: {123588}</p> */}

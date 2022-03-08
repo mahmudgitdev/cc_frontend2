@@ -485,7 +485,7 @@ export default function AuthorPlayScreen() {
               <p className='text-sm font-bold'>Game PIN:</p>
               <div title={isCopiyed?"Copied Link":"Copy Link to Share"} className='bg-gray-100 p-2 rounded'>
                <CopyToClipboard
-               text={`http://localhost:3000/refer?pin=${gamepin}`}
+               text={`http://championchallenger.demo.saz-zad.com/refer?pin=${gamepin}`}
                onCopy={()=>setIsCopied(true)}
               >
               <p className='text-4xl md:text-5xl font-bold cursor-pointer'>{gamepin}</p>

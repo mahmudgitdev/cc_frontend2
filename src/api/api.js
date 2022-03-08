@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL:"http://localhost:5000",
+    baseURL:"http://champion-be.mpg.saz-zad.com",
     headers: { 
         'Content-Type': 'application/json'
      }

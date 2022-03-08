@@ -15,7 +15,7 @@ export default function SingleQuizScreen() {
     const [isShow,setIsShow] = useState(false);
     const [selectedId,setSelectedId] = useState("");
     const [user,setUser] = useState({});
-    const [modalIsOpen, setIsOpen] = useState(false);
+    // const [modalIsOpen, setIsOpen] = useState(false);
     const [assignmodalIsOpen,setassignmodalIsOpen] = useState(false);
     const [isLoading,setIsLoading] = useState(false);
     const [endDate,setEndDate] = useState("");
@@ -69,9 +69,9 @@ export default function SingleQuizScreen() {
       setIsShow(true);
       }
     }
-    const closeModal =()=>{
-      setIsOpen(false);
-    }
+    // const closeModal =()=>{
+    //   setIsOpen(false);
+    // }
 
     const closeAssignModal = ()=>{
       setassignmodalIsOpen(false)
@@ -111,7 +111,7 @@ export default function SingleQuizScreen() {
     return (
         <div>
             <Header user={user} />
-            <Modal
+            {/* <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 style={customStyles}
@@ -131,11 +131,11 @@ export default function SingleQuizScreen() {
               </div>
 
 
-            </Modal>
+            </Modal> */}
 
             <Modal
                 isOpen={assignmodalIsOpen}
-                onRequestClose={closeModal}
+                onRequestClose={closeAssignModal}
                 style={customStyles}
             >
               <div>
@@ -221,7 +221,7 @@ export default function SingleQuizScreen() {
                                 <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{quiz.title}</h5>
                             {myAssignment.length === 0?(
                               <>
-                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              <button onClick={()=>setassignmodalIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                               Start
                               <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                               </button>
@@ -233,7 +233,7 @@ export default function SingleQuizScreen() {
                               Start
                               </button>
                               </Link>
-                              <button onClick={()=>setIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              <button onClick={()=>setassignmodalIsOpen(true)} className="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                               Assign
                               </button>
                               </div>
