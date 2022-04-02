@@ -1,5 +1,7 @@
-Championchallenger is a game-based learning platform similar to kahoot.com build with React.js
+Championchallenger is a game-based learning platform similar to kahoot.com build with React.js.
+
 Features:
+
 1. User authentications system
 2. User can create Quiz
 3. A quiz have n number of questions with two types of questions, multiple choice questions and open-ended questions.
